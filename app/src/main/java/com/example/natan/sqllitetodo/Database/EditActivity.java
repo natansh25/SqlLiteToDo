@@ -14,16 +14,19 @@ import com.example.natan.sqllitetodo.R;
 
 public class EditActivity extends AppCompatActivity {
     private EditText edt;
+    private Todo todo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         edt=findViewById(R.id.txt_edit);
 
-        Todo todo=getIntent().getParcelableExtra("object");
+         todo=getIntent().getParcelableExtra("object");
         if (todo !=null) {
-            Toast.makeText(this, String.valueOf(todo.getTitle()), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, String.valueOf(todo.getTitle()), Toast.LENGTH_SHORT).show();
+            edt.setText(todo.getTitle());
         }
+
     }
 
 
@@ -40,11 +43,22 @@ public class EditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            Toast.makeText(this, "saved !!", Toast.LENGTH_SHORT).show();
-            Intent i=new Intent(EditActivity.this, MainActivity.class);
-            i.putExtra("save",edt.getText().toString());
-            startActivity(i);
-            return true;
+
+            if (todo==null) {
+                //Toast.makeText(this, "saved !!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(EditActivity.this, MainActivity.class);
+                i.putExtra("save", edt.getText().toString());
+                startActivity(i);
+                return true;
+            }
+            else
+            {
+                Intent intent=new Intent(EditActivity.this,MainActivity.class);
+                intent.putExtra("result",edt.getText().toString());
+                setResult(2,intent);
+                finish();
+
+            }
         }
         return super.onOptionsItemSelected(item);
     }

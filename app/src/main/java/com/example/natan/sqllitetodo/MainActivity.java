@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(Todo notes) {
                     Intent i=new Intent(MainActivity.this,EditActivity.class);
-                    i.putExtra("object", (Parcelable) notes);
-                    startActivity(i);
+                    i.putExtra("object",notes);
+                    startActivityForResult(i,2);
                 }
             });
             mRecyclerView.setAdapter(mMyAdapter);
@@ -71,17 +71,27 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, EditActivity.class);
                 startActivity(i);
-                Toast.makeText(MainActivity.this, "huaaallaalla", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "huaaallaalla", Toast.LENGTH_SHORT).show();
             }
         });
 
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==2)
+        {
+            if (data !=null)
+            {
+                Toast.makeText(this, data.getStringExtra("result"), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     String getTimeAndDate() {
         Calendar c = Calendar.getInstance();
-        Toast.makeText(this, String.valueOf(c.getTime()), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, String.valueOf(c.getTime()), Toast.LENGTH_SHORT).show();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = df.format(c.getTime());
         Log.i("xyz", String.valueOf(formattedDate));
