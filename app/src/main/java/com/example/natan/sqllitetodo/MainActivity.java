@@ -1,7 +1,10 @@
 package com.example.natan.sqllitetodo;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +19,9 @@ import android.widget.Toast;
 import com.example.natan.sqllitetodo.Adapter.MyAdapter;
 import com.example.natan.sqllitetodo.Adapter.Todo;
 import com.example.natan.sqllitetodo.Database.EditActivity;
+import com.example.natan.sqllitetodo.Database.MyContract;
+import com.example.natan.sqllitetodo.Database.MySqlProvider;
+import com.facebook.stetho.Stetho;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fab_btn;
     private RecyclerView mRecyclerView;
     private MyAdapter mMyAdapter;
-    private List<Todo> mTodos;
+    //private List<Todo> mTodos;
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +42,29 @@ public class MainActivity extends AppCompatActivity {
         getTimeAndDate();
         fab_btn = findViewById(R.id.fab);
         mRecyclerView = findViewById(R.id.recyclerView);
-        mTodos = new ArrayList<>();
+        //mTodos = new ArrayList<>();
+        MySqlProvider mySqlProvider = new MySqlProvider(this);
+        mDb = mySqlProvider.getWritableDatabase();
+        Stetho.initializeWithDefaults(this);
+        Cursor cursor = getAllNotes();
 
         //catching the intent coming from edit activity
+
+
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //Todo todo = new Todo(title, getTimeAndDate());
+        //mTodos.add(todo);
+        mMyAdapter = new MyAdapter(cursor, this, new MyAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onClick(Todo notes) {
+                Intent i = new Intent(MainActivity.this, EditActivity.class);
+                i.putExtra("object", notes);
+                startActivityForResult(i, 2);
+            }
+        });
+        mRecyclerView.setAdapter(mMyAdapter);
 
 
         Bundle i = getIntent().getExtras();
@@ -48,19 +75,13 @@ public class MainActivity extends AppCompatActivity {
 
             // setting up the recycler view
 
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            Todo todo = new Todo(title, getTimeAndDate());
-            mTodos.add(todo);
-            mMyAdapter = new MyAdapter(mTodos, new MyAdapter.RecyclerViewClickListener() {
-                @Override
-                public void onClick(Todo notes) {
-                    Intent i=new Intent(MainActivity.this,EditActivity.class);
-                    i.putExtra("object",notes);
-                    startActivityForResult(i,2);
-                }
-            });
-            mRecyclerView.setAdapter(mMyAdapter);
+            mDb = mySqlProvider.getWritableDatabase();
+            insert(title, getTimeAndDate());
+            // Update the cursor in the adapter to trigger UI to display the new list
+            mMyAdapter.swapCursor(getAllNotes());
+
+
+
         }
 
 
@@ -80,10 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==2)
-        {
-            if (data !=null)
-            {
+        if (requestCode == 2) {
+            if (data != null) {
                 Toast.makeText(this, data.getStringExtra("result"), Toast.LENGTH_SHORT).show();
             }
         }
@@ -99,5 +118,38 @@ public class MainActivity extends AppCompatActivity {
         return formattedDate;
 
 
+    }
+    //---------quering all the data-------------------------
+
+    Cursor getAllNotes() {
+
+        return mDb.query(
+                MyContract.NotesEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+
+    }
+
+
+    // insert metod for inserting data into the databse
+
+    private long insert(String word, String date_time) {
+        long newID = 0;
+        if (word != null && date_time != null) {
+
+
+            ContentValues cv = new ContentValues();
+            cv.put(MyContract.NotesEntry.COLUMN_TITLE, word);
+            cv.put(MyContract.NotesEntry.COLUMN_DATE_TIME, date_time);
+            newID = mDb.insert(MyContract.NotesEntry.TABLE_NAME, null, cv);
+
+        }
+        return newID;
     }
 }

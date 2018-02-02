@@ -9,15 +9,10 @@ import android.provider.BaseColumns;
 public class MyContract {
 
 
-    private MyContract() {
-
-    }
-
-
     public static class NotesEntry implements BaseColumns {
         public static final String TABLE_NAME = "todo";
         public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_DATE_TIME = "date&time";
+        public static final String COLUMN_DATE_TIME = "datetime";
         //public static final String COLUMN_TIME = "time";
 
     }
