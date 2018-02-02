@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -51,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         //catching the intent coming from edit activity
 
 
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         //Todo todo = new Todo(title, getTimeAndDate());
@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             mMyAdapter.swapCursor(getAllNotes());
 
 
-
         }
 
 
@@ -95,6 +94,39 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(MainActivity.this, "huaaallaalla", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        // itemTouchHelper to delete the items
+
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+
+
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                long id = (long) viewHolder.itemView.getTag();
+                removeList(id);
+                mMyAdapter.swapCursor(getAllNotes());
+
+            }
+        }).attachToRecyclerView(mRecyclerView);
+
+
+    }
+
+    private void removeList(long id) {
+
+        /*String[] projection = {MyContract.NotesEntry.TABLE_NAME};
+        String selection = MyContract.NotesEntry._ID + "=?";
+        long[] selectionArgs = {id};*/
+
+        mDb.delete(MyContract.NotesEntry.TABLE_NAME, MyContract.NotesEntry._ID + "=" + id, null);
 
 
     }
