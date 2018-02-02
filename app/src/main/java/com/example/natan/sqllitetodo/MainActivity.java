@@ -135,9 +135,37 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 2) {
             if (data != null) {
-                Toast.makeText(this, data.getStringExtra("result"), Toast.LENGTH_SHORT).show();
+
+                Bundle bundle = data.getExtras();
+
+                String title = bundle.getString("result");
+                int id = bundle.getInt("id");
+                update(title, id, getTimeAndDate());
+                mMyAdapter.swapCursor(getAllNotes());
+
+                //Toast.makeText(this, data.getStringExtra("result"),data.getIntExtra("id"), Toast.LENGTH_SHORT).show();
+                //Log.i("hula",data.getStringExtra("result"));
+                //Log.i("hula", String.valueOf(bundle.getInt("id")));
             }
         }
+    }
+
+    private int update(String title, int id, String timeAndDate) {
+
+        int mNumberOfRowsUpdated = -1;
+
+
+        ContentValues cv = new ContentValues();
+        cv.put(MyContract.NotesEntry.COLUMN_TITLE, title);
+        cv.put(MyContract.NotesEntry.COLUMN_DATE_TIME, timeAndDate);
+
+        String selection = MyContract.NotesEntry._ID + "=?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+
+        mNumberOfRowsUpdated = mDb.update(MyContract.NotesEntry.TABLE_NAME, cv, selection, selectionArgs);
+
+        return mNumberOfRowsUpdated;
     }
 
     String getTimeAndDate() {

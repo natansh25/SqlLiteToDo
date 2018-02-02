@@ -119,7 +119,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             mCursor.moveToPosition(getAdapterPosition());
             String title = mCursor.getString(mCursor.getColumnIndex(MyContract.NotesEntry.COLUMN_TITLE));
             String data_time = mCursor.getString(mCursor.getColumnIndex(MyContract.NotesEntry.COLUMN_DATE_TIME));
-            Todo todo = new Todo(title, data_time);
+            int id=mCursor.getInt(mCursor.getColumnIndex(MyContract.NotesEntry._ID));
+            Todo todo = new Todo(title, data_time,id);
             mListener.onClick(todo);
 
 

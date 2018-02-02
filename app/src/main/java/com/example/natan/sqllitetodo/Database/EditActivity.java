@@ -26,6 +26,7 @@ public class EditActivity extends AppCompatActivity {
         if (todo != null) {
             //Toast.makeText(this, String.valueOf(todo.getTitle()), Toast.LENGTH_SHORT).show();
             edt.setText(todo.getTitle());
+            Toast.makeText(this, String.valueOf(todo.getId()), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -56,6 +57,7 @@ public class EditActivity extends AppCompatActivity {
             } else {
                 Intent intent = new Intent(EditActivity.this, MainActivity.class);
                 intent.putExtra("result", edt.getText().toString());
+                intent.putExtra("id", todo.getId());
                 setResult(2, intent);
                 finish();
 

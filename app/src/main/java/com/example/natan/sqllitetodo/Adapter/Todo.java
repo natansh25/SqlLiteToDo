@@ -10,13 +10,21 @@ import android.os.Parcelable;
 public class Todo implements Parcelable {
 
     String title, date_time;
+    int id;
 
-
-    public Todo(String title, String date_time) {
-        this.title = title;
-        this.date_time = date_time;
+    public int getId() {
+        return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Todo(String title, String date_time, int id) {
+        this.title = title;
+        this.date_time = date_time;
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -44,14 +52,16 @@ public class Todo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.title);
         dest.writeString(this.date_time);
+        dest.writeInt(this.id);
     }
 
     protected Todo(Parcel in) {
         this.title = in.readString();
         this.date_time = in.readString();
+        this.id = in.readInt();
     }
 
-    public static final Parcelable.Creator<Todo> CREATOR = new Parcelable.Creator<Todo>() {
+    public static final Creator<Todo> CREATOR = new Creator<Todo>() {
         @Override
         public Todo createFromParcel(Parcel source) {
             return new Todo(source);
